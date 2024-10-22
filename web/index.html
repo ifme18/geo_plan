@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="geo_plan">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>geo_plan</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+</head>
+<body>
+<script src="flutter_bootstrap.js" async></script>
+
+<script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdj0apmOp6lTlf7sMpBDldFp8WB70iRkg",
+      authDomain: "test-2618d.firebaseapp.com",
+      databaseURL: "https://test-2618d-default-rtdb.firebaseio.com",
+      projectId: "test-2618d",
+      storageBucket: "test-2618d.appspot.com",
+      messagingSenderId: "347431242639",
+      appId: "1:347431242639:web:e2f1ba1f4584fd8bfed9fa"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    // Optional: Initialize Firebase services you need
+    // const auth = getAuth(app); // for Firebase Authentication
+    // const db = getFirestore(app); // for Firestore
+    // const database = getDatabase(app); // for Realtime Database
+  </script>
+</body>
+</html>
