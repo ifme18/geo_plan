@@ -116,7 +116,7 @@ class DashboardScreen extends StatelessWidget {
                 }
                 return _buildStyledCard(
                   title: 'Total Expenses',
-                  subtitle: '\$${snapshot.data!.toStringAsFixed(2)}',
+                  subtitle: 'KES ${snapshot.data!.toStringAsFixed(2)}', // Changed to KES
                   icon: Icons.money_off,
                   color: Colors.redAccent,
                 );
@@ -133,7 +133,7 @@ class DashboardScreen extends StatelessWidget {
                 }
                 return _buildStyledCard(
                   title: 'Pending Payments',
-                  subtitle: '\$${snapshot.data!.toStringAsFixed(2)}',
+                  subtitle: 'KES ${snapshot.data!.toStringAsFixed(2)}', // Changed to KES
                   icon: Icons.pending,
                   color: Colors.orangeAccent,
                 );
@@ -150,7 +150,7 @@ class DashboardScreen extends StatelessWidget {
                 }
                 return _buildStyledCard(
                   title: 'Total Paid Balance',
-                  subtitle: '\$${snapshot.data!.toStringAsFixed(2)}',
+                  subtitle: 'KES ${snapshot.data!.toStringAsFixed(2)}', // Changed to KES
                   icon: Icons.check_circle_outline,
                   color: Colors.greenAccent,
                 );
@@ -237,4 +237,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
+
+
 

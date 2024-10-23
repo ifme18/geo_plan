@@ -64,7 +64,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Remaining Balance: \${remainingBalance.toStringAsFixed(2)}',
+                  'Remaining Balance: kes ${remainingBalance.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 24),
@@ -85,7 +85,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
                       return ListTile(
                         title: Text(stageName),
-                        subtitle: Text('Amount: \$${stageAmount.toStringAsFixed(2)}'),
+                        subtitle: Text('Amount: KES ${stageAmount.toStringAsFixed(2)}'),
                         trailing: Checkbox(
                           value: isPaid,
                           onChanged: (value) {
@@ -152,89 +152,119 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
     final pdf = pw.Document();
 
     // Load the logo image
-    final logoImage = await _loadImage('assets/images/Untitled design.png'); // Update the path as necessary
+    final logoImage = await _loadImage('assets/images/Untitled design.png');
+
+    // Current date for the invoice
+    final invoiceDate = DateTime.now();
+    final formattedDate = '${invoiceDate.day}-${invoiceDate.month}-${invoiceDate.year}';
 
     pdf.addPage(
       pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            // Header with Logo and Company Details
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Image(logoImage, width: 100), // Logo on the left
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.end,
-                  children: [
-                    pw.Text(
-                      'GEOPLAN KENYA LTD',
-                      style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
-                    ),
-                    pw.Text('Kigio Plaza - Thika, 1st floor, No. K.1.16'),
-                    pw.Text('Uniafric House - Nairobi, 4th floor, No. 458'),
-                    pw.Text('P.O Box 522 - 00100 Thika'),
-                    pw.Text('Tel: +254 721 256 135 / +254 724 404 133'),
-                    pw.Text('Email: geoplankenya1@gmail.com, info@geoplankenya.co.ke'),
-                    pw.Text('www.geoplankenya.co.ke'),
-                  ],
-                ),
-              ],
-            ),
-            pw.SizedBox(height: 16),
-
-            // Invoice Title with Random Invoice Number
-            pw.Text('Performer Invoice', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-            pw.Text('Invoice No: ${DateTime.now().millisecondsSinceEpoch}', style: pw.TextStyle(fontSize: 16)),
-            pw.SizedBox(height: 16),
-
-            // Client Details
-            pw.Text('Client: $clientName', style: pw.TextStyle(fontSize: 16)),
-            pw.SizedBox(height: 8),
-            pw.Text('LR No: $clientLRNo', style: pw.TextStyle(fontSize: 16)),
-            pw.SizedBox(height: 16),
-
-            // Payment Details
-            pw.Text('Remaining Balance: \$${remainingBalance.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 18)),
-            pw.SizedBox(height: 24),
-
-            // Payment Stages Table
-            pw.Table.fromTextArray(
-              headers: ['Stage', 'Amount', 'Status'],
-              data: paymentStages.keys.map((stageName) {
-                final stageAmount = paymentStages[stageName]['amount'];
-                final isPaid = paymentStages[stageName]['isPaid'];
-
-                return [
-                  stageName,
-                  // Styling the amount in red if unpaid
-                  pw.Text(
-                    '\$${stageAmount.toStringAsFixed(2)}',
+        build: (context) {
+          return pw.Stack(
+            children: [
+              // Watermark in the background
+              pw.Positioned(
+                top: 200,
+                left: 100,
+                child: pw.Opacity(
+                  opacity: 0.1,
+                  child: pw.Text(
+                    'Proforma Invoice',
                     style: pw.TextStyle(
-                      color: isPaid ? PdfColors.black : PdfColors.red, // Color based on payment status
+                      fontSize: 60,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.grey,
                     ),
                   ),
-                  isPaid ? 'Paid' : 'Unpaid',
-                ];
-              }).toList(),
-            ),
+                ),
+              ),
 
-            pw.SizedBox(height: 24),
-            // Signature Placeholder
-            pw.Text('Authorized Signature:', style: pw.TextStyle(fontSize: 16)),
-            pw.Container(
-              height: 50,
-              width: 150,
-              decoration: pw.BoxDecoration(border: pw.Border.all(width: 2)),
-              child: pw.Text('Digital Signature Here', textAlign: pw.TextAlign.center),
-            ),
-          ],
-        ),
+              // Main content of the invoice
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Header Section
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Image(logoImage, width: 80), // Company Logo
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text('GEOPLAN KENYA LTD', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                          pw.Text('Kigio Plaza - Thika, 1st floor, No. K.1.16'),
+                          pw.Text('P.O Box 522 - 00100 Thika'),
+                          pw.Text('Tel: +254 721 256 135 / +254 724 404 133'),
+                          pw.Text('Email: geoplankenya1@gmail.com'),
+                          pw.Text('www.geoplankenya.co.ke'),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 20),
+
+                  // Invoice Title, Invoice Number, and Invoice Date
+                  pw.Text('Proforma Invoice', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('Invoice No: ${DateTime.now().millisecondsSinceEpoch}', style: pw.TextStyle(fontSize: 16)),
+                      pw.Text('Invoice Date: $formattedDate', style: pw.TextStyle(fontSize: 16)), // Invoice Date
+                    ],
+                  ),
+                  pw.SizedBox(height: 20),
+
+                  // Client Information
+                  pw.Text('Client: $clientName', style: pw.TextStyle(fontSize: 16)),
+                  pw.Text('LR No: $clientLRNo', style: pw.TextStyle(fontSize: 16)),
+                  pw.SizedBox(height: 20),
+
+                  // Payment Summary
+                  pw.Text('Summary', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 10),
+                  pw.Text('Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 16)),
+                  pw.SizedBox(height: 20),
+
+                  // Payment Stages Table
+                  pw.Text('Payment Stages:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  pw.Table.fromTextArray(
+                    headers: ['Stage', 'Amount', 'Status'],
+                    data: paymentStages.keys.map((stageName) {
+                      final stageAmount = paymentStages[stageName]['amount'];
+                      final isPaid = paymentStages[stageName]['isPaid'];
+
+                      return [
+                        stageName,
+                        'KES ${stageAmount.toStringAsFixed(2)}',
+                        isPaid ? 'Paid' : 'Unpaid',
+                      ];
+                    }).toList(),
+                  ),
+                  pw.SizedBox(height: 30),
+
+                  // Footer (Signature, Notes)
+                  pw.Text('Authorized Signature:', style: pw.TextStyle(fontSize: 16)),
+                  pw.Container(
+                    width: 150,
+                    height: 40,
+                    decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
+                    child: pw.Text('Signature here', textAlign: pw.TextAlign.center),
+                  ),
+                  pw.SizedBox(height: 20),
+
+                  pw.Text('Thank you for your business!', style: pw.TextStyle(fontSize: 16)),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
 
     return pdf;
   }
+
 
   // Method to load the image
   Future<pw.ImageProvider> _loadImage(String path) async {

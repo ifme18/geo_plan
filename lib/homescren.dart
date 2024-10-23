@@ -161,17 +161,17 @@ class HomeScreen extends StatelessWidget {
                               Text('LR No: ${data?.containsKey('lrNo') == true ? data!['lrNo'] : 'N/A'}'),
                               SizedBox(height: 4),
                               // Safely display payment stages
-                              Text('Downpayment: \$${(paymentStages['Downpayment']?['amount'] ?? 0).toStringAsFixed(2)}'),
-                              Text('County Approval: \$${(paymentStages['County Approvals']?['amount'] ?? 0).toStringAsFixed(2)}'),
-                              Text('Land Approval: \$${(paymentStages['Land Approvals']?['amount'] ?? 0).toStringAsFixed(2)}'),
-                              Text('Title Payment: \$${(paymentStages['Title Payments']?['amount'] ?? 0).toStringAsFixed(2)}'),
+                              Text('Downpayment: KES ${(paymentStages['Downpayment']?['amount'] ?? 0).toStringAsFixed(2)}'),
+                              Text('County Approval: KES ${(paymentStages['County Approvals']?['amount'] ?? 0).toStringAsFixed(2)}'),
+                              Text('Land Approval: KES ${(paymentStages['Land Approvals']?['amount'] ?? 0).toStringAsFixed(2)}'),
+                              Text('Title Payment: KES ${(paymentStages['Title Payments']?['amount'] ?? 0).toStringAsFixed(2)}'),
                             ],
                           ),
                           trailing: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Pending: \$${(data?['pendingBalance'] ?? 0).toStringAsFixed(2)}',
+                                'Pending: KES ${(data?['pendingBalance'] ?? 0).toStringAsFixed(2)}',
                                 style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -225,7 +225,7 @@ class HomeScreen extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                           trailing: Text(
-                            '\$${(expenseData?['amount'] ?? 0).toStringAsFixed(2)}',
+                            'KES${(expenseData?['amount'] ?? 0).toStringAsFixed(2)}',
                             style: TextStyle(
                               color: (expenseData?['isPaid'] ?? false) ? Colors.green : Colors.red,
                               fontWeight: FontWeight.bold,
@@ -287,7 +287,7 @@ class BalanceContainer extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                '\$${amount.toStringAsFixed(2)}',
+                'KES ${amount.toStringAsFixed(2)}',
                 style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ],

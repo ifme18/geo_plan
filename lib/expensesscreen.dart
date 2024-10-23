@@ -114,7 +114,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               // Total Expenses Display
               Center(
                 child: Text(
-                  'Total Expenses: \$${totalExpenses.toStringAsFixed(2)}',
+                  'Total Expenses: KES ${totalExpenses.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.green),
                 ),
               ),
@@ -184,7 +184,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 ),
                 title: Text(doc['type'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 subtitle: Text(
-                  'Amount: \$${doc['amount'].toStringAsFixed(2)}\nDescription: ${doc['description']}',
+                  'Amount: KES ${doc['amount'].toStringAsFixed(2)}\nDescription: ${doc['description']}',
                   style: TextStyle(fontSize: 16),
                 ),
               ),
