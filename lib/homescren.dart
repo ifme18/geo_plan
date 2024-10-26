@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geo_plan/quick%20quotes.dart';
 import 'clientdetailscreen.dart';
 import 'dashboard.dart'; // Import your DashboardScreen
+import 'Appointmentallocation.dart'; // Import the DiaryScreen
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -61,7 +63,109 @@ class HomeScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'View overall stats and reports',
+                            'check your company spending and stats',
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
+              // Appointments Navigation Container
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuotationScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.purpleAccent,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.request_quote_outlined, size: 36, color: Colors.white),
+                      SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Quick quotes',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'create quick quotations',
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
+              // Appointments Navigation Container
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DiaryScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.purpleAccent,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.calendar_today, size: 36, color: Colors.white),
+                      SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Appointments',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'View your diary and appointments',
                             style: TextStyle(fontSize: 14, color: Colors.white),
                           ),
                         ],
@@ -85,7 +189,6 @@ class HomeScreen extends StatelessWidget {
                   double totalPending = 0;
                   double totalPaid = 0;
 
-                  // Calculate total pending and paid balance from clients
                   snapshot.data!.docs.forEach((doc) {
                     final data = doc.data() as Map<String, dynamic>?;
                     final pendingBalance = data?['pendingBalance'] ?? 0.0;
@@ -120,7 +223,6 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               SizedBox(height: 8),
-              // Client List
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('clients').snapshots(),
                 builder: (context, snapshot) {
@@ -160,7 +262,6 @@ class HomeScreen extends StatelessWidget {
                               SizedBox(height: 4),
                               Text('LR No: ${data?.containsKey('lrNo') == true ? data!['lrNo'] : 'N/A'}'),
                               SizedBox(height: 4),
-                              // Safely display payment stages
                               Text('Downpayment: KES ${(paymentStages['Downpayment']?['amount'] ?? 0).toStringAsFixed(2)}'),
                               Text('County Approval: KES ${(paymentStages['County Approvals']?['amount'] ?? 0).toStringAsFixed(2)}'),
                               Text('Land Approval: KES ${(paymentStages['Land Approvals']?['amount'] ?? 0).toStringAsFixed(2)}'),
@@ -187,53 +288,6 @@ class HomeScreen extends StatelessWidget {
                         ),
                       );
                     },
-                  );
-                },
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Expenses',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-              ),
-              SizedBox(height: 8),
-              // Expenses List
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('expenses').snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(child: Text("Error loading data"));
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-
-                  final expenses = snapshot.data!.docs;
-
-                  return Column(
-                    children: expenses.map((expense) {
-                      final expenseData = expense.data() as Map<String, dynamic>?;
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 4,
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.all(16),
-                          title: Text(
-                            expenseData?.containsKey('name') == true ? expenseData!['name'] : 'Unnamed Expense',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          trailing: Text(
-                            'KES${(expenseData?['amount'] ?? 0).toStringAsFixed(2)}',
-                            style: TextStyle(
-                              color: (expenseData?['isPaid'] ?? false) ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
                   );
                 },
               ),
@@ -297,4 +351,3 @@ class BalanceContainer extends StatelessWidget {
     );
   }
 }
-

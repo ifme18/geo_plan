@@ -148,6 +148,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
   }
 
   // Method to create the PDF content
+  // Method to create the PDF content with more decorations
   Future<pw.Document> _createInvoicePdf() async {
     final pdf = pw.Document();
 
@@ -170,11 +171,11 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                 child: pw.Opacity(
                   opacity: 0.1,
                   child: pw.Text(
-                    'Proforma Invoice',
+                    'Geoplan LTD',
                     style: pw.TextStyle(
                       fontSize: 60,
                       fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.grey,
+                      color: PdfColors.red,
                     ),
                   ),
                 ),
@@ -185,27 +186,35 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   // Header Section
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Image(logoImage, width: 80), // Company Logo
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.end,
-                        children: [
-                          pw.Text('GEOPLAN KENYA LTD', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
-                          pw.Text('Kigio Plaza - Thika, 1st floor, No. K.1.16'),
-                          pw.Text('P.O Box 522 - 00100 Thika'),
-                          pw.Text('Tel: +254 721 256 135 / +254 724 404 133'),
-                          pw.Text('Email: geoplankenya1@gmail.com'),
-                          pw.Text('www.geoplankenya.co.ke'),
-                        ],
-                      ),
-                    ],
+                  pw.Container(
+                    padding: pw.EdgeInsets.all(10),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.green, width: 2),
+                      borderRadius: pw.BorderRadius.circular(5),
+                    ),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Image(logoImage, width: 150, height: 150,), // Company Logo
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.end,
+                          children: [
+                            pw.Text('GEOPLAN KENYA LTD', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold, color: PdfColors.green)),
+                            pw.Text('Kigio Plaza - Thika, 1st floor, No. K.1.16', style: pw.TextStyle(color: PdfColors.grey700)),
+                            pw.Text('P.O Box 522 - 00100 Thika', style: pw.TextStyle(color: PdfColors.grey700)),
+                            pw.Text('Tel: +254 721 256 135 / +254 724 404 133', style: pw.TextStyle(color: PdfColors.grey700)),
+                            pw.Text('Email: geoplankenya1@gmail.com', style: pw.TextStyle(color: PdfColors.grey700)),
+                            pw.Text('www.geoplankenya.co.ke', style: pw.TextStyle(color: PdfColors.grey700)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   pw.SizedBox(height: 20),
 
                   // Invoice Title, Invoice Number, and Invoice Date
-                  pw.Text('Proforma Invoice', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Proforma Invoice', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.blue)),
+                  pw.SizedBox(height: 10),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
@@ -216,20 +225,44 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   pw.SizedBox(height: 20),
 
                   // Client Information
-                  pw.Text('Client: $clientName', style: pw.TextStyle(fontSize: 16)),
-                  pw.Text('LR No: $clientLRNo', style: pw.TextStyle(fontSize: 16)),
+                  pw.Container(
+                    padding: pw.EdgeInsets.all(10),
+                    decoration: pw.BoxDecoration(
+                      color: PdfColors.green50,
+                      border: pw.Border.all(color: PdfColors.green, width: 1),
+                      borderRadius: pw.BorderRadius.circular(5),
+                    ),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Client: $clientName', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                        pw.Text('LR No: $clientLRNo', style: pw.TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                  ),
                   pw.SizedBox(height: 20),
 
                   // Payment Summary
-                  pw.Text('Summary', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Summary', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue)),
                   pw.SizedBox(height: 10),
-                  pw.Text('Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 16)),
+                  pw.Text('Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 16, color: PdfColors.red)),
                   pw.SizedBox(height: 20),
 
                   // Payment Stages Table
-                  pw.Text('Payment Stages:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                  pw.Text('Payment Stages:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue)),
+                  pw.SizedBox(height: 10),
                   pw.Table.fromTextArray(
                     headers: ['Stage', 'Amount', 'Status'],
+                    headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                    headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
+                    cellAlignment: pw.Alignment.centerLeft,
+                    cellHeight: 30,
+                    cellStyle: pw.TextStyle(fontSize: 12),
+                    rowDecoration: pw.BoxDecoration(
+                      border: pw.Border(
+                        bottom: pw.BorderSide(color: PdfColors.grey, width: 0.5),
+                      ),
+                    ),
                     data: paymentStages.keys.map((stageName) {
                       final stageAmount = paymentStages[stageName]['amount'];
                       final isPaid = paymentStages[stageName]['isPaid'];
@@ -244,16 +277,26 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   pw.SizedBox(height: 30),
 
                   // Footer (Signature, Notes)
-                  pw.Text('Authorized Signature:', style: pw.TextStyle(fontSize: 16)),
-                  pw.Container(
-                    width: 150,
-                    height: 40,
-                    decoration: pw.BoxDecoration(border: pw.Border.all(width: 1)),
-                    child: pw.Text('Signature here', textAlign: pw.TextAlign.center),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Authorized Signature:', style: pw.TextStyle(fontSize: 16)),
+                          pw.Container(
+                            width: 150,
+                            height: 40,
+                            decoration: pw.BoxDecoration(
+                              border: pw.Border.all(width: 1, color: PdfColors.black),
+                            ),
+                            child: pw.Text('Signature here', textAlign: pw.TextAlign.center),
+                          ),
+                        ],
+                      ),
+                      pw.Text('Thank you for your business!', style: pw.TextStyle(fontSize: 16, color: PdfColors.blue)),
+                    ],
                   ),
-                  pw.SizedBox(height: 20),
-
-                  pw.Text('Thank you for your business!', style: pw.TextStyle(fontSize: 16)),
                 ],
               ),
             ],
@@ -264,6 +307,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
     return pdf;
   }
+
 
 
   // Method to load the image
