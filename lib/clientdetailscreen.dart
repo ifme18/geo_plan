@@ -30,98 +30,113 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
         title: Text('Client Details'),
         backgroundColor: Colors.green,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance.collection('clients').doc(widget.clientId).get(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text("Error loading client data"));
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = constraints.maxWidth;
+          final padding = screenWidth * 0.05;
+          final fontSizeTitle = screenWidth * 0.05;
+          final fontSizeBody = screenWidth * 0.04;
 
-            // Extracting data
-            final clientData = snapshot.data!.data() as Map<String, dynamic>;
-            remainingBalance = clientData['pendingBalance'];
-            paymentStages = clientData['paymentStages'] as Map<String, dynamic>;
-            clientName = clientData['name'];
-            clientLRNo = clientData['lrNo'];
+          return Padding(
+            padding: EdgeInsets.all(padding),
+            child: FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('clients')
+                  .doc(widget.clientId)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error loading client data"));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Client Information
-                Text(
-                  'Client: $clientName',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'LR No: $clientLRNo',
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Remaining Balance: kes ${remainingBalance.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 18),
-                ),
-                SizedBox(height: 24),
+                // Extracting data
+                final clientData = snapshot.data!.data() as Map<String, dynamic>;
+                remainingBalance = clientData['pendingBalance'];
+                paymentStages = clientData['paymentStages'] as Map<String, dynamic>;
+                clientName = clientData['name'];
+                clientLRNo = clientData['lrNo'];
 
-                // Payment Stages List
-                Text(
-                  'Payment Stages:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: paymentStages.length,
-                    itemBuilder: (context, index) {
-                      final stageName = paymentStages.keys.elementAt(index);
-                      final stageAmount = paymentStages[stageName]['amount'];
-                      final isPaid = paymentStages[stageName]['isPaid'];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Client Information
+                    Text(
+                      'Client: $clientName',
+                      style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: padding / 2),
+                    Text(
+                      'LR No: $clientLRNo',
+                      style: TextStyle(fontSize: fontSizeBody),
+                    ),
+                    SizedBox(height: padding),
+                    Text(
+                      'Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}',
+                      style: TextStyle(fontSize: fontSizeTitle, color: Colors.redAccent),
+                    ),
+                    SizedBox(height: padding),
 
-                      return ListTile(
-                        title: Text(stageName),
-                        subtitle: Text('Amount: KES ${stageAmount.toStringAsFixed(2)}'),
-                        trailing: Checkbox(
-                          value: isPaid,
-                          onChanged: (value) {
-                            setState(() {
-                              // Update payment status locally first
-                              paymentStages[stageName]['isPaid'] = value;
+                    // Payment Stages List
+                    Text(
+                      'Payment Stages:',
+                      style: TextStyle(fontSize: fontSizeTitle, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: padding / 2),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: paymentStages.length,
+                        itemBuilder: (context, index) {
+                          final stageName = paymentStages.keys.elementAt(index);
+                          final stageAmount = paymentStages[stageName]['amount'];
+                          final isPaid = paymentStages[stageName]['isPaid'];
 
-                              // Adjust remaining balance
-                              if (value == true) {
-                                remainingBalance -= stageAmount;
-                              } else {
-                                remainingBalance += stageAmount;
-                              }
+                          return ListTile(
+                            title: Text(stageName),
+                            subtitle: Text('Amount: KES ${stageAmount.toStringAsFixed(2)}'),
+                            trailing: Checkbox(
+                              value: isPaid,
+                              onChanged: (value) {
+                                setState(() {
+                                  // Update payment status locally first
+                                  paymentStages[stageName]['isPaid'] = value;
 
-                              // Update Firestore with new data
-                              FirebaseFirestore.instance.collection('clients').doc(widget.clientId).update({
-                                'paymentStages.$stageName.isPaid': value,
-                                'pendingBalance': remainingBalance,
-                              });
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                                  // Adjust remaining balance
+                                  if (value == true) {
+                                    remainingBalance -= stageAmount;
+                                  } else {
+                                    remainingBalance += stageAmount;
+                                  }
 
-                // Generate Invoice Button
-                ElevatedButton(
-                  onPressed: _generateInvoice,
-                  child: Text('Generate Invoice'),
-                ),
-              ],
-            );
-          },
-        ),
+                                  // Update Firestore with new data
+                                  FirebaseFirestore.instance
+                                      .collection('clients')
+                                      .doc(widget.clientId)
+                                      .update({
+                                    'paymentStages.$stageName.isPaid': value,
+                                    'pendingBalance': remainingBalance,
+                                  });
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Generate Invoice Button
+                    ElevatedButton(
+                      onPressed: _generateInvoice,
+                      child: Text('Generate Invoice'),
+                    ),
+                  ],
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
@@ -148,7 +163,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
   }
 
   // Method to create the PDF content
-  // Method to create the PDF content with more decorations
   Future<pw.Document> _createInvoicePdf() async {
     final pdf = pw.Document();
 
@@ -164,7 +178,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
         build: (context) {
           return pw.Stack(
             children: [
-              // Watermark in the background
               pw.Positioned(
                 top: 200,
                 left: 100,
@@ -181,7 +194,6 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                 ),
               ),
 
-              // Main content of the invoice
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
@@ -195,7 +207,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     child: pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Image(logoImage, width: 150, height: 150,), // Company Logo
+                        pw.Image(logoImage, width: 150, height: 150), // Company Logo
                         pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.end,
                           children: [
@@ -245,57 +257,32 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   // Payment Summary
                   pw.Text('Summary', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue)),
                   pw.SizedBox(height: 10),
-                  pw.Text('Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 16, color: PdfColors.red)),
+                  pw.Table.fromTextArray(
+                    headers: ['Stage', 'Amount (KES)', 'Status'],
+                    data: paymentStages.entries.map((entry) {
+                      final stageName = entry.key;
+                      final stageData = entry.value as Map<String, dynamic>;
+                      final amount = stageData['amount'].toStringAsFixed(2);
+                      final isPaid = stageData['isPaid'] == true ? 'Paid' : 'Pending';
+
+                      return [stageName, amount, isPaid];
+                    }).toList(),
+                    border: pw.TableBorder.all(color: PdfColors.green, width: 1),
+                    headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    headerDecoration: pw.BoxDecoration(color: PdfColors.green100),
+                    cellPadding: pw.EdgeInsets.all(5),
+                  ),
                   pw.SizedBox(height: 20),
 
-                  // Payment Stages Table
-                  pw.Text('Payment Stages:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue)),
-                  pw.SizedBox(height: 10),
-                  pw.Table.fromTextArray(
-                    headers: ['Stage', 'Amount', 'Status'],
-                    headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
-                    headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
-                    cellAlignment: pw.Alignment.centerLeft,
-                    cellHeight: 30,
-                    cellStyle: pw.TextStyle(fontSize: 12),
-                    rowDecoration: pw.BoxDecoration(
-                      border: pw.Border(
-                        bottom: pw.BorderSide(color: PdfColors.grey, width: 0.5),
-                      ),
+                  // Remaining Balance
+                  pw.Container(
+                    padding: pw.EdgeInsets.all(10),
+                    decoration: pw.BoxDecoration(
+                      color: PdfColors.red50,
+                      border: pw.Border.all(color: PdfColors.red, width: 1),
+                      borderRadius: pw.BorderRadius.circular(5),
                     ),
-                    data: paymentStages.keys.map((stageName) {
-                      final stageAmount = paymentStages[stageName]['amount'];
-                      final isPaid = paymentStages[stageName]['isPaid'];
-
-                      return [
-                        stageName,
-                        'KES ${stageAmount.toStringAsFixed(2)}',
-                        isPaid ? 'Paid' : 'Unpaid',
-                      ];
-                    }).toList(),
-                  ),
-                  pw.SizedBox(height: 30),
-
-                  // Footer (Signature, Notes)
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Text('Authorized Signature:', style: pw.TextStyle(fontSize: 16)),
-                          pw.Container(
-                            width: 150,
-                            height: 40,
-                            decoration: pw.BoxDecoration(
-                              border: pw.Border.all(width: 1, color: PdfColors.black),
-                            ),
-                            child: pw.Text('Signature here', textAlign: pw.TextAlign.center),
-                          ),
-                        ],
-                      ),
-                      pw.Text('Thank you for your business!', style: pw.TextStyle(fontSize: 16, color: PdfColors.blue)),
-                    ],
+                    child: pw.Text('Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 16, color: PdfColors.red)),
                   ),
                 ],
               ),
@@ -308,13 +295,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
     return pdf;
   }
 
-
-
-  // Method to load the image
+  // Helper function to load image
   Future<pw.ImageProvider> _loadImage(String path) async {
-    final ByteData bytes = await rootBundle.load(path);
-    final Uint8List imageData = bytes.buffer.asUint8List();
-    return pw.MemoryImage(imageData);
+    final data = await rootBundle.load(path);
+    return pw.MemoryImage(data.buffer.asUint8List());
   }
 }
 
