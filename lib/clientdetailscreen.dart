@@ -10,7 +10,7 @@ import 'dart:io';
 class ClientDetailScreen extends StatefulWidget {
   final String clientId;
 
-  ClientDetailScreen({required this.clientId});
+  const ClientDetailScreen({Key? key, required this.clientId}) : super(key: key);
 
   @override
   _ClientDetailScreenState createState() => _ClientDetailScreenState();
@@ -25,130 +25,189 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Client Details'),
+        title: const Text('Client Details'),
         backgroundColor: Colors.green,
+        elevation: 0, // Removes shadow under AppBar
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance
-              .collection('clients')
-              .doc(widget.clientId)
-              .get(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text("Error loading client data"));
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+      body: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('clients')
+                  .doc(widget.clientId)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text(
+                      "Error loading client data",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
 
-            final clientData = snapshot.data!.data() as Map<String, dynamic>;
-            remainingBalance = clientData['pendingBalance'];
-            paymentStages = clientData['paymentStages'] as Map<String, dynamic>;
-            clientName = clientData['name'];
-            clientLRNo = clientData['lrNo'];
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                  );
+                }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Client Information',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8.0),
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green[50],
-                    border: Border.all(color: Colors.green, width: 1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                final clientData = snapshot.data!.data() as Map<String, dynamic>;
+                remainingBalance = clientData['pendingBalance'];
+                paymentStages = clientData['paymentStages'] as Map<String, dynamic>;
+                clientName = clientData['name'];
+                clientLRNo = clientData['lrNo'];
+
+                return Container(
+                  color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Name: $clientName',
-                          style: TextStyle(fontSize: 16)),
-                      SizedBox(height: 4.0),
-                      Text('LR No: $clientLRNo', style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                Text(
-                  'Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}',
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 16.0),
-                Text(
-                  'Payment Stages',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8.0),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: paymentStages.length,
-                    itemBuilder: (context, index) {
-                      final stageName = paymentStages.keys.elementAt(index);
-                      final stageAmount = paymentStages[stageName]['amount'];
-                      final isPaid = paymentStages[stageName]['isPaid'];
+                      Text(
+                        'Client Information',
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.green[50],
+                          border: Border.all(color: Colors.green, width: 1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Name: $clientName',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 4.0),
+                            Text(
+                              'LR No: $clientLRNo',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'Payment Stages',
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Expanded(
+                        child: Container(
+                          color: Colors.white,
+                          child: ListView.builder(
+                            itemCount: paymentStages.length,
+                            itemBuilder: (context, index) {
+                              final stageName = paymentStages.keys.elementAt(index);
+                              final stageAmount = paymentStages[stageName]['amount'];
+                              final isPaid = paymentStages[stageName]['isPaid'];
 
-                      return Card(
-                        margin: EdgeInsets.symmetric(vertical: 4.0),
-                        child: ListTile(
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          title: Text(stageName,
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(
-                              'Amount: KES ${stageAmount.toStringAsFixed(2)}'),
-                          trailing: Checkbox(
-                            value: isPaid,
-                            onChanged: (value) {
-                              setState(() {
-                                paymentStages[stageName]['isPaid'] = value;
-                                remainingBalance += value! ? -stageAmount : stageAmount;
-                                FirebaseFirestore.instance
-                                    .collection('clients')
-                                    .doc(widget.clientId)
-                                    .update({
-                                  'paymentStages.$stageName.isPaid': value,
-                                  'pendingBalance': remainingBalance,
-                                });
-                              });
+                              return Card(
+                                elevation: 2,
+                                margin: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  title: Text(
+                                    stageName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    'Amount: KES ${stageAmount.toStringAsFixed(2)}',
+                                    style: const TextStyle(color: Colors.black54),
+                                  ),
+                                  trailing: Checkbox(
+                                    value: isPaid,
+                                    activeColor: Colors.green,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        paymentStages[stageName]['isPaid'] = value;
+                                        remainingBalance +=
+                                        value! ? -stageAmount : stageAmount;
+                                        FirebaseFirestore.instance
+                                            .collection('clients')
+                                            .doc(widget.clientId)
+                                            .update({
+                                          'paymentStages.$stageName.isPaid': value,
+                                          'pendingBalance': remainingBalance,
+                                        });
+                                      });
+                                    },
+                                  ),
+                                ),
+                              );
                             },
                           ),
                         ),
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 16.0),
+                      Align(
+                        alignment: Alignment.center,
+                        child: ElevatedButton(
+                          onPressed: _generateAndShareInvoice,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Generate and Share Invoice',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                    ],
                   ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: ElevatedButton(
-                    onPressed: _generateAndShareInvoice,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: Text('Generate and Share Invoice',
-                        style: TextStyle(fontSize: 16)),
-                  ),
-                ),
-              ],
-            );
-          },
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -211,9 +270,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             pw.Text(
                               'GEOPLAN KENYA LTD',
                               style: pw.TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: pw.FontWeight.bold,
-                                  color: PdfColors.green),
+                                fontSize: 20,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.green,
+                              ),
                             ),
                             pw.Text(
                               'Kigio Plaza - Thika, 1st floor, No. K.1.16',
@@ -231,19 +291,24 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                               'Email: geoplankenya1@gmail.com',
                               style: pw.TextStyle(color: PdfColors.grey700),
                             ),
-                            pw.Text('www.geoplankenya.co.ke',
-                                style: pw.TextStyle(color: PdfColors.grey700)),
+                            pw.Text(
+                              'www.geoplankenya.co.ke',
+                              style: pw.TextStyle(color: PdfColors.grey700),
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
                   pw.SizedBox(height: 20),
-                  pw.Text('Proforma Invoice',
-                      style: pw.TextStyle(
-                          fontSize: 24,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.blue)),
+                  pw.Text(
+                    'Proforma Invoice',
+                    style: pw.TextStyle(
+                      fontSize: 24,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.blue,
+                    ),
+                  ),
                   pw.SizedBox(height: 10),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -269,20 +334,27 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('Client Name: $clientName',
-                            style: pw.TextStyle(fontSize: 16)),
+                        pw.Text(
+                          'Client Name: $clientName',
+                          style: pw.TextStyle(fontSize: 16),
+                        ),
                         pw.SizedBox(height: 5),
-                        pw.Text('LR No: $clientLRNo',
-                            style: pw.TextStyle(fontSize: 16)),
+                        pw.Text(
+                          'LR No: $clientLRNo',
+                          style: pw.TextStyle(fontSize: 16),
+                        ),
                       ],
                     ),
                   ),
                   pw.SizedBox(height: 20),
-                  pw.Text('Payment Stages:',
-                      style: pw.TextStyle(
-                          fontSize: 20,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.green)),
+                  pw.Text(
+                    'Payment Stages:',
+                    style: pw.TextStyle(
+                      fontSize: 20,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.green,
+                    ),
+                  ),
                   pw.SizedBox(height: 10),
                   pw.Table(
                     border: pw.TableBorder.all(color: PdfColors.black),
@@ -291,18 +363,24 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                         children: [
                           pw.Padding(
                             padding: pw.EdgeInsets.all(8),
-                            child: pw.Text('Stage',
-                                style: pw.TextStyle(fontSize: 16)),
+                            child: pw.Text(
+                              'Stage',
+                              style: pw.TextStyle(fontSize: 16),
+                            ),
                           ),
                           pw.Padding(
                             padding: pw.EdgeInsets.all(8),
-                            child: pw.Text('Amount (KES)',
-                                style: pw.TextStyle(fontSize: 16)),
+                            child: pw.Text(
+                              'Amount (KES)',
+                              style: pw.TextStyle(fontSize: 16),
+                            ),
                           ),
                           pw.Padding(
                             padding: pw.EdgeInsets.all(8),
-                            child: pw.Text('Paid Status',
-                                style: pw.TextStyle(fontSize: 16)),
+                            child: pw.Text(
+                              'Paid Status',
+                              style: pw.TextStyle(fontSize: 16),
+                            ),
                           ),
                         ],
                       ),
@@ -316,12 +394,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                             pw.Padding(
                               padding: pw.EdgeInsets.all(8),
                               child: pw.Text(
-                                  entry.value['amount'].toStringAsFixed(2)),
+                                entry.value['amount'].toStringAsFixed(2),
+                              ),
                             ),
                             pw.Padding(
                               padding: pw.EdgeInsets.all(8),
                               child: pw.Text(
-                                  entry.value['isPaid'] ? 'Paid' : 'Unpaid'),
+                                entry.value['isPaid'] ? 'Paid' : 'Unpaid',
+                              ),
                             ),
                           ],
                         ),
@@ -332,9 +412,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                   pw.Text(
                     'Remaining Balance: KES ${remainingBalance.toStringAsFixed(2)}',
                     style: pw.TextStyle(
-                        fontSize: 18,
-                        color: PdfColors.redAccent,
-                        fontWeight: pw.FontWeight.bold),
+                      fontSize: 18,
+                      color: PdfColors.redAccent,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -352,6 +433,3 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
     return pw.MemoryImage(data.buffer.asUint8List());
   }
 }
-
-
-
